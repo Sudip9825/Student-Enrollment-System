@@ -1,0 +1,71 @@
+server:
+  port: 8060
+
+spring:
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 60000
+
+  application:
+    name: Student-Enrollment-System
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: sudipdahal779@gmail.com
+    password: vdoj rvzn pmrb yzoz
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/project2_db
+    username: root
+    password: root
+
+  jpa:
+    hibernate:
+      ddl-auto: none   # let Liquibase handle schema, not Hibernate
+    database-platform: org.hibernate.dialect.MySQLDialect
+    show-sql: true
+
+
+
+    database: mysql
+    properties:
+      hibernate:
+        format_sql: true
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/changelog-master.yaml
+    contexts: dev
+    clear-checksums: true
+
+
+
+#  servlet:
+#    multipart:
+#      max-file-size: 10MB
+#
+#
+#      max-request-size: 10MB
+#
+#  web:
+#    resources:
+#      static-locations: file:./uploads/
+
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+jwt:
+   secret: 0480b3180664d04d5c1e4add71a051e0f4dc221cbae62b08137390d7c32c70ee
