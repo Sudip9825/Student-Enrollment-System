@@ -13,7 +13,7 @@ public class ListCourseResponse {
     private String description;
     private String category;
     private String price;
-    private boolean is_free;
+    private Boolean isFree;
     @CreatedDate
     @JsonFormat(pattern = "yyyy-mm-dd hh:mm:s a")
     private LocalDateTime created_at;

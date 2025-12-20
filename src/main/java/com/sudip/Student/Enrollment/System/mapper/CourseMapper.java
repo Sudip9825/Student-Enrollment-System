@@ -6,6 +6,7 @@ import com.sudip.Student.Enrollment.System.dto.coursedto.UpdateCourseReq;
 import com.sudip.Student.Enrollment.System.dto.coursedto.ViewCourseResponse;
 import com.sudip.Student.Enrollment.System.entity.Course;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;
 import org.springframework.data.domain.Page;
@@ -20,12 +21,14 @@ public abstract class CourseMapper {
         Course course = new Course();
         course.setCourseTitle(addCourseReq.getCourseTitle());
         course.setDescription(addCourseReq.getDescription());
-        course.setDescription(addCourseReq.getDescription());
+        course.setCategory(addCourseReq.getCategory());
         course.setPrice(Long.valueOf(addCourseReq.getPrice()));
         return course;
     }
 
     //mapper for listing all courses
+    @Mapping(target = "title", source = "courseTitle")
+    @Mapping(target = "isFree", source = "isFree")
     public abstract ListCourseResponse entityToResponseDto(Course course);
     public List<ListCourseResponse> ListAllCourses(Page<Course> courses) {
         return courses.getContent()

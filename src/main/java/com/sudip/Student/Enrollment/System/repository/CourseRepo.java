@@ -30,14 +30,14 @@ public interface CourseRepo extends JpaRepository<Course ,String> {
 
     @Query("""
         SELECT c FROM Course c
-        WHERE c.price = 0 OR c.is_free = true
+        WHERE c.price = 0 OR c.isFree = true
     """)
     Page<Course> findFreeCourses(Pageable pageable);
 
 
     @Query("""
         SELECT c FROM Course c
-        WHERE c.price > 0 OR c.is_free = false
+        WHERE c.price > 0 OR c.isFree = false
     """)
     Page<Course> findPaidCourses(Pageable pageable);
 

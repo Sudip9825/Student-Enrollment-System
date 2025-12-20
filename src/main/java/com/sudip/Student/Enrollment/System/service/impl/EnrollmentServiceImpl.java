@@ -1,0 +1,101 @@
+package com.sudip.Student.Enrollment.System.service.impl;
+
+import com.sudip.Student.Enrollment.System.Exception.NotFoundException;
+import com.sudip.Student.Enrollment.System.core.dto.ApiResponse;
+import com.sudip.Student.Enrollment.System.dto.Enrollmentdto.EnrollmentResponseDto;
+import com.sudip.Student.Enrollment.System.entity.Course;
+import com.sudip.Student.Enrollment.System.entity.Enrollment;
+import com.sudip.Student.Enrollment.System.entity.User;
+import com.sudip.Student.Enrollment.System.enums.EnrollmentStatus;
+import com.sudip.Student.Enrollment.System.enums.PaymentStatus;
+import com.sudip.Student.Enrollment.System.mapper.CourseMapper;
+import com.sudip.Student.Enrollment.System.mapper.EnrollmentMapper;
+import com.sudip.Student.Enrollment.System.repository.CourseRepo;
+import com.sudip.Student.Enrollment.System.repository.EnrollmentRepository;
+import com.sudip.Student.Enrollment.System.repository.UserRepository;
+import com.sudip.Student.Enrollment.System.service.EnrollmentService;
+import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+@Service
+
+public class EnrollmentServiceImpl implements EnrollmentService {
+
+    private static final Logger log = LoggerFactory.getLogger(CourseServiceImpl.class);
+
+    @Autowired
+    private EnrollmentMapper enrollmentMapper;
+    @Autowired
+    private EnrollmentRepository enrollmentRepository;
+    @Autowired
+    private CourseRepo courseRepo;
+    @Autowired
+    private UserRepository userRepository;
+    @Transactional
+
+
+    @Override
+    public ApiResponse<?> enrollCourse(Integer courseId) {
+        Course course = courseRepo.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("Course not found"));
+
+        User user =getLoggedInUser();
+        boolean alreadyEnrolled =
+                enrollmentRepository.existsByUserAndCourse(user, Optional.ofNullable(course));
+
+        if (alreadyEnrolled) {
+            throw new RuntimeException("User already enrolled in this course");
+        }
+        // 4️⃣ Create new enrollment
+        Enrollment enrollment = new Enrollment();
+        enrollment.setUser(user);
+        enrollment.setCourse(course);
+        enrollment.setEnrollmentDate(LocalDateTime.now());
+
+        // 5️⃣ FREE vs PAID logic
+        if (course.getPrice() == 0 ) {
+
+            enrollment.setStatus(EnrollmentStatus.ACTIVE);
+            enrollment.setPaymentStatus(PaymentStatus.FREE);
+            enrollment.setAmount(BigDecimal.ZERO);
+
+        } else {
+
+            enrollment.setStatus(EnrollmentStatus.INACTIVE);
+            enrollment.setPaymentStatus(PaymentStatus.PENDING);
+            enrollment.setAmount(BigDecimal.valueOf(course.getPrice()));
+        }
+
+        // 6️⃣ Save enrollment
+        Enrollment savedEnrollment = enrollmentRepository.save(enrollment);
+
+        // 7️⃣ Convert entity to response DTO
+        EnrollmentResponseDto responseDto =
+                enrollmentMapper.toResponseDto(savedEnrollment);
+
+        // 8️⃣ Return API response
+        return new ApiResponse<>(
+                true,
+                "Enrollment successful",
+                200,
+                responseDto
+        );
+
+
+
+    }
+
+    private User getLoggedInUser() {
+        User user = new User();
+        user.setId(1);
+        user.setUsername("Test User");
+        return (user);
+    }
+}

@@ -3,6 +3,8 @@ package com.sudip.Student.Enrollment.System.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -26,9 +28,20 @@ public class Course {
     @Column(name="price" , nullable=false)
     private Long price;
     @Column(name="is_free")
-    private  boolean is_free;
+    public Boolean isFree;
+
+    @CreatedDate
     @Column(name="created_at" , nullable=false)
     private LocalDateTime created_at;
+
     @Column(name="updated_at")
+    @LastModifiedDate
     private LocalDateTime updated_at;
+
+    @PrePersist
+    @PreUpdate
+    private void setIsFreeBasedOnPrice() {
+        this.isFree = (this.price == null || this.price == 0);
+    }
+
 }
