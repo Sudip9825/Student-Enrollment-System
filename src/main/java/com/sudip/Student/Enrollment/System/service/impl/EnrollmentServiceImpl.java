@@ -18,6 +18,9 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -60,6 +63,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         enrollment.setEnrollmentDate(LocalDateTime.now());
 
         // 5️⃣ FREE vs PAID logic
+        assert course != null;
         if (course.getPrice() == 0 ) {
 
             enrollment.setStatus(EnrollmentStatus.ACTIVE);
@@ -81,21 +85,13 @@ public class EnrollmentServiceImpl implements EnrollmentService {
                 enrollmentMapper.toResponseDto(savedEnrollment);
 
         // 8️⃣ Return API response
-        return new ApiResponse<>(
-                true,
-                "Enrollment successful",
-                200,
-                responseDto
-        );
-
-
-
+        return new ApiResponse<>(true, "Enrollment successful", 200, responseDto);
     }
 
     private User getLoggedInUser() {
-        User user = new User();
-        user.setId(1);
-        user.setUsername("Test User");
-        return (user);
+       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+       UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+       String email = userDetails.getUsername();
+       return userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
     }
 }
