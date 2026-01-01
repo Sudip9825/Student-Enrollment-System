@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -56,13 +57,13 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         if (alreadyEnrolled) {
             throw new RuntimeException("User already enrolled in this course");
         }
-        // 4️⃣ Create new enrollment
+        // 4️Create new enrollment
         Enrollment enrollment = new Enrollment();
         enrollment.setUser(user);
         enrollment.setCourse(course);
         enrollment.setEnrollmentDate(LocalDateTime.now());
 
-        // 5️⃣ FREE vs PAID logic
+        //  FREE vs PAID logic
         assert course != null;
         if (course.getPrice() == 0 ) {
 
@@ -77,15 +78,41 @@ public class EnrollmentServiceImpl implements EnrollmentService {
             enrollment.setAmount(BigDecimal.valueOf(course.getPrice()));
         }
 
-        // 6️⃣ Save enrollment
+        // Save enrollment
         Enrollment savedEnrollment = enrollmentRepository.save(enrollment);
 
-        // 7️⃣ Convert entity to response DTO
+        //Convert entity to response DTO
         EnrollmentResponseDto responseDto =
                 enrollmentMapper.toResponseDto(savedEnrollment);
 
-        // 8️⃣ Return API response
-        return new ApiResponse<>(true, "Enrollment successful", 200, responseDto);
+        return new ApiResponse<>(true, "Enrollment successful", 200,LocalDateTime.now(), responseDto);
+    }
+
+    @Override
+    public ApiResponse<?> getMyEnrollments() {
+        User user = getLoggedInUser();
+        List<Enrollment> enrollments = enrollmentRepository.findByUser(user);
+        List<EnrollmentResponseDto> response = enrollments.stream()
+                .map(enrollmentMapper::toResponseDto)
+                .toList();
+        return new ApiResponse<>(
+                true, "My Enrollments", 200, LocalDateTime.now(), response);
+    }
+
+    @Override
+    public ApiResponse<?> isUserEnrolled(Integer courseId) {
+
+        return null;
+    }
+
+    @Override
+    public ApiResponse<?> getEnrollmentById(Integer enrollmentId) {
+        return null;
+    }
+
+    @Override
+    public ApiResponse<?> getMyEnrollmentsByCourse(Integer courseId) {
+        return null;
     }
 
     private User getLoggedInUser() {
