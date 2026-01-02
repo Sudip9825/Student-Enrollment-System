@@ -101,8 +101,14 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
     @Override
     public ApiResponse<?> isUserEnrolled(Integer courseId) {
+        User user = getLoggedInUser();
 
-        return null;
+        Course course = courseRepo.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("Course not found"));
+
+        boolean isEnrolled = enrollmentRepository.existsByUserAndCourse(user, Optional.ofNullable(course));
+         return new ApiResponse<>( true, "user enrolled",200,isEnrolled);
+
     }
 
     @Override

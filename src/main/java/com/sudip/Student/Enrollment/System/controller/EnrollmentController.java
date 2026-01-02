@@ -1,6 +1,7 @@
 package com.sudip.Student.Enrollment.System.controller;
 
 import com.sudip.Student.Enrollment.System.core.dto.ApiResponse;
+import com.sudip.Student.Enrollment.System.dto.userdto.ListUserResponse;
 import com.sudip.Student.Enrollment.System.entity.Enrollment;
 import com.sudip.Student.Enrollment.System.service.EnrollmentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,11 @@ public class EnrollmentController {
     @GetMapping("/enrollments/my")
     public ResponseEntity<ApiResponse<?>> enrollments() {
         ApiResponse<?> apiResponse = enrollmentService.getMyEnrollments();
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
+    @PostMapping("/enrollments/check/{courseId}")
+    public ResponseEntity<ApiResponse<?>> checkEnrollment(@PathVariable Integer courseId) {
+        ApiResponse<?> apiResponse = enrollmentService.isUserEnrolled(courseId);
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 }
