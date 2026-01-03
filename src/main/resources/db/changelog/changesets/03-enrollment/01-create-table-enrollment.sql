@@ -2,14 +2,14 @@
 -- changeset sudip.dahal:suppler-create-v1     context:dev
 -- preconditions onFail:CONTINUE onError:HALT
 CREATE TABLE IF NOT EXISTS `enrollment` (
-                                            id INT AUTO_INCREMENT PRIMARY KEY,
+  id INT AUTO_INCREMENT PRIMARY KEY,
 
-                                            user_id INT NOT NULL,
-                                            course_id INT NOT NULL,
+user_id INT NOT NULL,
+ course_id INT NOT NULL,
 
-                                            enrollment_date TIMESTAMP NOT NULL,
+  enrollment_date TIMESTAMP NOT NULL,
 
-                                            status VARCHAR(20) NOT NULL,
+   status VARCHAR(20) NOT NULL,
     payment_status VARCHAR(20) NOT NULL,
 
     amount DECIMAL(10,2) NOT NULL,
